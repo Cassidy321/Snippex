@@ -74,7 +74,6 @@ const snippetSchema = new mongoose.Schema(
     codeLength: {
       type: String,
       enum: ["short", "medium", "long"],
-      required: true,
     },
     viewCount: {
       type: Number,
