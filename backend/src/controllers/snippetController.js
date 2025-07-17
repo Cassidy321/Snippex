@@ -152,8 +152,63 @@ const getSnippetById = async (req, res) => {
   }
 };
 
+const updateSnippet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, code, technology, useCase } = req.body;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        error: "Invalid snippet ID",
+      });
+    }
+
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (code !== undefined) updateData.code = code;
+    if (technology !== undefined) updateData.technology = technology;
+    if (useCase !== undefined) updateData.useCase = useCase;
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        error: "No fields to update",
+      });
+    }
+
+    const snippet = await Snippet.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!snippet) {
+      return res.status(404).json({
+        error: "Snippet not found",
+      });
+    }
+
+    res.json({
+      message: "Snippet updated",
+      snippet,
+    });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        error: "Validation failed",
+        details: error.message,
+      });
+    }
+
+    res.status(500).json({
+      error: "Error updating snippet",
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createSnippet,
   getSnippets,
   getSnippetById,
+  updateSnippet,
 };
