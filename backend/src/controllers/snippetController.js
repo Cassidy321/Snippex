@@ -206,9 +206,39 @@ const updateSnippet = async (req, res) => {
   }
 };
 
+const deleteSnippet = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        error: "Invalid snippet ID",
+      });
+    }
+
+    const snippet = await Snippet.findByIdAndDelete(id);
+
+    if (!snippet) {
+      return res.status(404).json({
+        error: "Snippet not found",
+      });
+    }
+
+    res.json({
+      message: "Snippet deleted",
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Error deleting snippet",
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createSnippet,
   getSnippets,
   getSnippetById,
   updateSnippet,
+  deleteSnippet,
 };
