@@ -7,6 +7,10 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 const connectDatabase = require("./src/config/database");
 const snippetRoutes = require("./src/routes/snippet");
+const authRoutes = require("./src/routes/auth");
+const dotenv = require("dotenv");
+
+require("dotenv").config();
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -21,6 +25,7 @@ app.use(limiter);
 connectDatabase();
 
 app.use("/api/snippets", snippetRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
