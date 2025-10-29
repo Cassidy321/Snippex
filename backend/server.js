@@ -9,6 +9,7 @@ const connectDatabase = require("./src/config/database");
 const snippetRoutes = require("./src/routes/snippet");
 const authRoutes = require("./src/routes/auth");
 const passport = require("./src/config/passport");
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
 
@@ -18,10 +19,16 @@ const limiter = rateLimit({
 });
 
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: "10mb" }));
 app.use(limiter);
 app.use(passport.initialize());
+app.use(cookieParser());
 
 connectDatabase();
 
