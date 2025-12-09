@@ -4,10 +4,10 @@ import tsparser from "@typescript-eslint/parser";
 export default [
   {
     files: ["src/**/*.ts"],
-    languagesOptions: {
+    languageOptions: {
       parser: tsparser,
       parserOptions: {
-        project: "ts.config.json",
+        project: "./tsconfig.json",
       },
     },
     plugins: {

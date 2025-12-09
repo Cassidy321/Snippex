@@ -1,8 +1,4 @@
-import mongoose, {
-  Schema,
-  Types,
-  InferSchemaType,
-} from "mongoose";
+import mongoose, { Schema, Types, InferSchemaType } from "mongoose";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
@@ -46,20 +42,14 @@ const userSchema = new Schema(
       },
     },
     statics: {
-      async isEmailTaken(
-        email: string,
-        excludeUserId?: Types.ObjectId
-      ): Promise<boolean> {
+      async isEmailTaken(email: string, excludeUserId?: Types.ObjectId): Promise<boolean> {
         const user = await this.findOne({
           email,
           _id: { $ne: excludeUserId },
         });
         return !!user;
       },
-      async isUsernameTaken(
-        username: string,
-        excludeUserId?: Types.ObjectId
-      ): Promise<boolean> {
+      async isUsernameTaken(username: string, excludeUserId?: Types.ObjectId): Promise<boolean> {
         const user = await this.findOne({
           username,
           _id: { $ne: excludeUserId },
@@ -71,19 +61,13 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (
-    !this.isModified("authentication.password") ||
-    !this.authentication?.password
-  ) {
+  if (!this.isModified("authentication.password") || !this.authentication?.password) {
     return next();
   }
 
   try {
     const salt = await bcrypt.genSalt(SALT_ROUNDS);
-    this.authentication.password = await bcrypt.hash(
-      this.authentication.password,
-      salt
-    );
+    this.authentication.password = await bcrypt.hash(this.authentication.password, salt);
     next();
   } catch (error) {
     next(error as Error);
@@ -98,8 +82,6 @@ userSchema.methods.toJSON = function () {
 
 export type User = InferSchemaType<typeof userSchema>;
 
-const User = mongoose.model("User", userSchema);
+export const User = mongoose.model("User", userSchema);
 
 export type UserDocument = InstanceType<typeof User>;
-
-export default User;

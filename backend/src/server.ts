@@ -5,9 +5,8 @@ import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 
-import { connectDatabase } from "@/config/database";
-import logger from "@/config/logger";
-// import passport from "@/config/passport";
+import { connectDatabase } from "@/config";
+import { logger } from "@/config";
 // import snippetRoutes from "@/routes/snippet";
 // import authRoutes from "@/routes/auth";
 
@@ -28,7 +27,6 @@ app.use(
 );
 app.use(express.json({ limit: "10mb" }));
 app.use(limiter);
-// app.use(passport.initialize());
 app.use(cookieParser());
 
 // app.use("/api/snippets", snippetRoutes);
