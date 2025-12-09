@@ -5,7 +5,7 @@ import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 
-import connectDatabase from "@/config/database";
+import { connectDatabase } from "@/config/database";
 import logger from "@/config/logger";
 // import passport from "@/config/passport";
 // import snippetRoutes from "@/routes/snippet";
