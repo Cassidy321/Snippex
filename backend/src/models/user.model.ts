@@ -36,7 +36,7 @@ const userSchema = new Schema(
   {
     timestamps: true,
     methods: {
-      async doPasswordMatch(candidatePassword: string): Promise<boolean> {
+      async doPasswordsMatch(candidatePassword: string): Promise<boolean> {
         if (!this.authentication?.password) return false;
         return bcrypt.compare(candidatePassword, this.authentication.password);
       },
