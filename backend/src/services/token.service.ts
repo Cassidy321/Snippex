@@ -1,6 +1,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Response } from "express";
 import { env } from "@/config";
+import { ApiError } from "@/utils";
 
 export interface TokenPayload extends JwtPayload {
   id: string;
@@ -9,6 +10,11 @@ export interface TokenPayload extends JwtPayload {
 
 export interface RefreshTokenPayload extends JwtPayload {
   id: string;
+}
+
+interface Tokens {
+  accessToken: string;
+  refreshToken: string;
 }
 
 const ACCESS_TOKEN_EXPIRY = "15m";
@@ -27,12 +33,27 @@ export const generateRefreshToken = (userId: string): string => {
   });
 };
 
+export const generateTokens = (userId: string, email: string): Tokens => {
+  return {
+    accessToken: generateAccessToken(userId, email),
+    refreshToken: generateRefreshToken(userId),
+  };
+};
+
 export const verifyAccessToken = (token: string): TokenPayload => {
-  return jwt.verify(token, env.JWT_SECRET) as TokenPayload;
+  try {
+    return jwt.verify(token, env.JWT_SECRET) as TokenPayload;
+  } catch {
+    throw new ApiError(401, "Invalid access token");
+  }
 };
 
 export const verifyRefreshToken = (token: string): RefreshTokenPayload => {
-  return jwt.verify(token, env.JWT_REFRESH_SECRET) as RefreshTokenPayload;
+  try {
+    return jwt.verify(token, env.JWT_REFRESH_SECRET) as RefreshTokenPayload;
+  } catch {
+    throw new ApiError(401, "Invalid refresh token");
+  }
 };
 
 export const setRefreshTokenCookie = (res: Response, refreshToken: string): void => {
