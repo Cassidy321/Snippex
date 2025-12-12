@@ -7,6 +7,7 @@ const envSchema = z.object({
   MONGODB_URI: z.string().min(1, "MONGODB_URI variable is required"),
   JWT_SECRET: z.string().min(1, "JWT_SECRET variable is required"),
   JWT_REFRESH_SECRET: z.string().min(1, "JWT_REFRESH_SECRET is required"),
+  CORS_ORIGIN: z.string().default("http://localhost:3000"),
 });
 
 const parsed = envSchema.safeParse(process.env);
