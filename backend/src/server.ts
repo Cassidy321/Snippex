@@ -1,45 +1,41 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
-import "dotenv/config";
+import pinoHttp from "pino-http";
 
-import { connectDatabase } from "@/config";
-import { logger } from "@/config";
-// import snippetRoutes from "@/routes/snippet";
-// import authRoutes from "@/routes/auth";
+import { env, logger, connectDatabase } from "@/config";
+import { errorHandler, notFoundHandler } from "@/middlewares";
+import { authRoutes } from "@/routes";
+import { globalLimiter, authLimiter } from "@/utils";
 
 const app = express();
-const PORT = process.env.PORT || 8000;
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-});
 
 app.use(helmet());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: env.CORS_ORIGIN,
     credentials: true,
   })
 );
 app.use(express.json({ limit: "10mb" }));
-app.use(limiter);
 app.use(cookieParser());
+app.use(globalLimiter);
+app.use(pinoHttp({ logger }));
 
-// app.use("/api/snippets", snippetRoutes);
-// app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes, authLimiter);
 
-app.get("/health", (_req: Request, res: Response) => {
+app.get("/health", (_req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
+app.use(notFoundHandler);
+app.use(errorHandler);
+
 const startServer = async (): Promise<void> => {
   await connectDatabase();
-  app.listen(PORT, () => {
-    logger.info(`Server running on port ${PORT}`);
+  app.listen(env.PORT, () => {
+    logger.info(`Server running on port ${env.PORT}`);
   });
 };
 

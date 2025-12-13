@@ -1,3 +1,3 @@
 export { authenticate } from "./auth.middleware";
 export { validate } from "./validate.middleware";
-export { errorHandler } from "./error.middleware";
+export { errorHandler, notFoundHandler } from "./error.middleware";
