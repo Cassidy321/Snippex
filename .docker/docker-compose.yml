@@ -1,4 +1,21 @@
+name: snippex
+
 services:
+  api:
+    build:
+      context: ../backend
+      target: base
+    volumes:
+      - ../backend/src:/app/src
+      - ../backend/tsconfig.json:/app/tsconfig.json
+    ports:
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
+    command: npm run dev
+
   mongodb:
     image: mongo:7
     ports:
@@ -6,7 +23,9 @@ services:
     volumes:
       - mongodb_data:/data/db
     environment:
-      MONGO_INITDB_DATABASE: snippex
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
 
 volumes:
   mongodb_data:
