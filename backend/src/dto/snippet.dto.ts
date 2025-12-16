@@ -36,4 +36,4 @@ export const getSnippetsQuerySchema = z.object({
 
 export type CreateSnippetDTO = z.infer<typeof createSnippetSchema>;
 export type UpdateSnippetDTO = z.infer<typeof updateSnippetSchema>;
-export type GetSnippetQueryDTO = z.infer<typeof getSnippetsQuerySchema>;
+export type GetSnippetsQueryDTO = z.infer<typeof getSnippetsQuerySchema>;
