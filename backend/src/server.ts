@@ -6,7 +6,7 @@ import pinoHttp from "pino-http";
 
 import { env, logger, connectDatabase } from "@/config";
 import { errorHandler, notFoundHandler } from "@/middlewares";
-import { authRoutes } from "@/routes";
+import { authRoutes, snippetRoutes } from "@/routes";
 import { globalLimiter, authLimiter } from "@/utils";
 
 const app = express();
@@ -24,6 +24,7 @@ app.use(globalLimiter);
 app.use(pinoHttp({ logger }));
 
 app.use("/api/auth", authRoutes, authLimiter);
+app.use("/api/snippets", snippetRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
