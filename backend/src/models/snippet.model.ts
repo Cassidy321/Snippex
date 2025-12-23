@@ -1,6 +1,101 @@
 import mongoose, { Schema, InferSchemaType } from "mongoose";
 
-export const TECHNOLOGIES = [] as const;
+export const TECHNOLOGIES = [
+  "javascript",
+  "typescript",
+  "python",
+  "java",
+  "csharp",
+  "cpp",
+  "c",
+  "go",
+  "rust",
+  "php",
+  "ruby",
+  "swift",
+  "kotlin",
+  "dart",
+  "scala",
+  "elixir",
+  "r",
+
+  "react",
+  "vue",
+  "angular",
+  "svelte",
+  "nextjs",
+  "nuxt",
+  "remix",
+  "sveltekit",
+  "solid",
+  "astro",
+  "jquery",
+
+  "nodejs",
+  "express",
+  "nestjs",
+  "fastify",
+  "django",
+  "flask",
+  "fastapi",
+  "spring",
+  "laravel",
+  "symfony",
+  "rails",
+  "aspnet",
+  "dotnet",
+  "gin",
+  "fiber",
+
+  "react-native",
+  "flutter",
+  "ionic",
+
+  "sql",
+  "postgresql",
+  "mysql",
+  "mongodb",
+  "redis",
+  "prisma",
+  "typeorm",
+  "sequelize",
+  "graphql",
+
+  "docker",
+  "kubernetes",
+  "terraform",
+  "ansible",
+  "nginx",
+
+  "html",
+  "css",
+  "scss",
+  "sass",
+  "tailwind",
+  "bootstrap",
+
+  "jest",
+  "vitest",
+  "cypress",
+  "playwright",
+  "mocha",
+
+  "vite",
+  "webpack",
+  "esbuild",
+  "rollup",
+
+  "firebase",
+  "supabase",
+  "strapi",
+
+  "electron",
+  "tauri",
+
+  "bash",
+  "powershell",
+  "regex",
+] as const;
 
 export const USE_CASES = [] as const;
 
