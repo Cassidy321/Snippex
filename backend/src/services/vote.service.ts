@@ -1,8 +1,13 @@
 import { ApiError } from "@/utils";
 import { Vote, Snippet } from "@/models";
 import { VoteDTO } from "@/dto/vote.dto";
+import { Types } from "mongoose";
 
 export const voteSnippet = async (snippetId: string, userId: string, voteType: VoteDTO["type"]) => {
+  if (!Types.ObjectId.isValid(snippetId)) {
+    throw new ApiError(400, "Invalid snippet id");
+  }
+
   const snippet = await Snippet.findById(snippetId);
   if (!snippet) {
     throw new ApiError(404, "Snippet not found");
@@ -22,14 +27,12 @@ export const voteSnippet = async (snippetId: string, userId: string, voteType: V
     existingVote.type = voteType;
     await existingVote.save();
 
-    if (oldType === "like") {
-      snippet.likesCount = Math.max(0, snippet.likesCount - 1);
-      snippet.dislikesCount += 1;
-    } else {
-      snippet.dislikesCount = Math.max(0, snippet.dislikesCount - 1);
-      snippet.likesCount += 1;
-    }
-    await snippet.save();
+    const updateOp =
+      oldType === "like"
+        ? { $inc: { likesCount: -1, dislikesCount: 1 } }
+        : { $inc: { likesCount: 1, dislikesCount: -1 } };
+
+    await Snippet.findByIdAndUpdate(snippetId, updateOp);
 
     return existingVote;
   }
@@ -40,17 +43,17 @@ export const voteSnippet = async (snippetId: string, userId: string, voteType: V
     type: voteType,
   });
 
-  if (voteType === "like") {
-    snippet.likesCount += 1;
-  } else {
-    snippet.dislikesCount += 1;
-  }
-  await snippet.save();
+  const incrementField = voteType === "like" ? "likesCount" : "dislikesCount";
+  await Snippet.findByIdAndUpdate(snippetId, { $inc: { [incrementField]: 1 } });
 
   return vote;
 };
 
 export const removeVote = async (snippetId: string, userId: string) => {
+  if (!Types.ObjectId.isValid(snippetId)) {
+    throw new ApiError(400, "Invalid snippet id");
+  }
+
   const vote = await Vote.findOne({
     snippet: snippetId,
     user: userId,
@@ -60,17 +63,8 @@ export const removeVote = async (snippetId: string, userId: string) => {
     throw new ApiError(404, "Vote not found");
   }
 
-  const snippet = await Snippet.findById(snippetId);
-  if (!snippet) {
-    throw new ApiError(404, "Snippet not found");
-  }
-
-  if (vote.type === "like") {
-    snippet.likesCount = Math.max(0, snippet.likesCount - 1);
-  } else {
-    snippet.dislikesCount = Math.max(0, snippet.dislikesCount - 1);
-  }
-  await snippet.save();
+  const decrementField = vote.type === "like" ? "likesCount" : "dislikesCount";
+  await Snippet.findByIdAndUpdate(snippetId, { $inc: { [decrementField]: -1 } });
 
   await vote.deleteOne();
 
@@ -78,6 +72,10 @@ export const removeVote = async (snippetId: string, userId: string) => {
 };
 
 export const getUserVote = async (snippetId: string, userId: string) => {
+  if (!Types.ObjectId.isValid(snippetId)) {
+    throw new ApiError(400, "Invalid snippet id");
+  }
+
   const vote = await Vote.findOne({
     snippet: snippetId,
     user: userId,
