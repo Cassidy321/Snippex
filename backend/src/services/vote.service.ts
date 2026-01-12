@@ -13,6 +13,10 @@ export const voteSnippet = async (snippetId: string, userId: string, voteType: V
     throw new ApiError(404, "Snippet not found");
   }
 
+  if (snippet.author.toString() === userId) {
+    throw new ApiError(400, "You cannot vote on your own snippet");
+  }
+
   const existingVote = await Vote.findOne({
     snippet: snippetId,
     user: userId,
