@@ -11,6 +11,7 @@ export const register = async (
     const user = await authService.registerUser(req.body);
     const tokens = tokenService.generateTokens(user._id.toString(), user.email);
 
+    await tokenService.saveRefreshToken(tokens.refreshToken, user._id.toString());
     tokenService.setRefreshTokenCookie(res, tokens.refreshToken);
 
     res.status(201).json({
@@ -32,6 +33,7 @@ export const login = async (
     const user = await authService.loginUser(req.body);
     const tokens = tokenService.generateTokens(user._id.toString(), user.email);
 
+    await tokenService.saveRefreshToken(tokens.refreshToken, user._id.toString());
     tokenService.setRefreshTokenCookie(res, tokens.refreshToken);
 
     res.status(200).json({
@@ -49,13 +51,21 @@ export const refresh = async (req: Request, res: Response, next: NextFunction): 
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      res.status(401).json({ error: "Session expired, plaese login again" });
+      res.status(401).json({ error: "Session expired, please login again" });
+      return;
+    }
+
+    const tokenExists = await tokenService.findRefreshToken(refreshToken);
+    if (!tokenExists) {
+      res.status(401).json({ error: "Session expired, please login again" });
       return;
     }
 
     const user = await authService.refreshAuth(refreshToken);
     const tokens = tokenService.generateTokens(user._id.toString(), user.email);
 
+    await tokenService.revokeRefreshToken(refreshToken);
+    await tokenService.saveRefreshToken(tokens.refreshToken, user._id.toString());
     tokenService.setRefreshTokenCookie(res, tokens.refreshToken);
 
     res.status(200).json({
@@ -67,7 +77,13 @@ export const refresh = async (req: Request, res: Response, next: NextFunction): 
   }
 };
 
-export const logout = async (_req: Request, res: Response): Promise<void> => {
+export const logout = async (req: Request, res: Response): Promise<void> => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (refreshToken) {
+    await tokenService.revokeRefreshToken(refreshToken);
+  }
+
   tokenService.clearRefreshTokenCookie(res);
   res.status(200).json({ message: "Logged out successfully" });
 };

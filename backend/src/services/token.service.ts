@@ -2,6 +2,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { Response } from "express";
 import { env } from "@/config";
 import { ApiError } from "@/utils";
+import { RefreshToken } from "@/models";
 
 export interface TokenPayload extends JwtPayload {
   id: string;
@@ -54,6 +55,24 @@ export const verifyRefreshToken = (token: string): RefreshTokenPayload => {
   } catch {
     throw new ApiError(401, "Invalid refresh token");
   }
+};
+
+export const saveRefreshToken = async (token: string, userId: string): Promise<void> => {
+  const expiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE);
+  await RefreshToken.create({ token, user: userId, expiresAt });
+};
+
+export const findRefreshToken = async (token: string): Promise<boolean> => {
+  const exists = await RefreshToken.exists({ token });
+  return !!exists;
+};
+
+export const revokeRefreshToken = async (token: string): Promise<void> => {
+  await RefreshToken.deleteOne({ token });
+};
+
+export const revokeAllUserTokens = async (userId: string): Promise<void> => {
+  await RefreshToken.deleteMany({ user: userId });
 };
 
 export const setRefreshTokenCookie = (res: Response, refreshToken: string): void => {

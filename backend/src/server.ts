@@ -23,7 +23,7 @@ app.use(cookieParser());
 app.use(globalLimiter);
 app.use(pinoHttp({ logger }));
 
-app.use("/api/auth", authRoutes, authLimiter);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/snippets", snippetRoutes);
 app.use("/api/snippets", voteRoutes);
 
