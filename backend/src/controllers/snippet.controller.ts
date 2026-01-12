@@ -14,7 +14,7 @@ export const getAllSnippets = catchAsync(async (req, res) => {
 });
 
 export const getOneSnippet = catchAsync(async (req, res) => {
-  const snippet = await snippetService.getSnippetById(req.params.id!);
+  const snippet = await snippetService.getSnippetById(req.params.id!, req.user?.id);
   res.json(snippet);
 });
 

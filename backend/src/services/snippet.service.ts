@@ -55,7 +55,7 @@ export const getSnippets = async (query: GetSnippetsQueryDTO) => {
   };
 };
 
-export const getSnippetById = async (id: string) => {
+export const getSnippetById = async (id: string, requestingUserId?: string) => {
   if (!Types.ObjectId.isValid(id)) {
     throw new ApiError(400, "This snippet id does not look right");
   }
@@ -65,6 +65,11 @@ export const getSnippetById = async (id: string) => {
   if (!snippet) {
     throw new ApiError(404, "This snippet does not exist");
   }
+
+  if (!snippet.isPublic && snippet.author._id.toString() !== requestingUserId) {
+    throw new ApiError(404, "This snippet does not exist");
+  }
+
   return snippet;
 };
 
