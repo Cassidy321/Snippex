@@ -1,6 +1,6 @@
 import { snippetService } from "@/services";
 import { catchAsync } from "@/utils";
-import { GetSnippetsQueryDTO } from "@/dto";
+import { GetSnippetsQueryDTO, PaginationQueryDTO } from "@/dto";
 
 export const createOneSnippet = catchAsync(async (req, res) => {
   const snippet = await snippetService.createSnippet(req.body, req.user!.id);
@@ -23,8 +23,13 @@ export const getOneSnippet = catchAsync(async (req, res) => {
 });
 
 export const getMySnippets = catchAsync(async (req, res) => {
-  const snippets = await snippetService.getSnippetsByAuthor(req.user!.id);
-  res.json({ success: true, data: { snippets } });
+  const query = req.validated?.query as PaginationQueryDTO;
+  const result = await snippetService.getSnippetsByAuthor(req.user!.id, query);
+  res.json({
+    success: true,
+    data: { snippets: result.snippets },
+    meta: { pagination: result.pagination },
+  });
 });
 
 export const updateOneSnippet = catchAsync(async (req, res) => {

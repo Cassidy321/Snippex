@@ -25,15 +25,19 @@ export const createSnippetSchema = z.object({
 
 export const updateSnippetSchema = createSnippetSchema.partial();
 
-export const getSnippetsQuerySchema = z.object({
+export const paginationQuerySchema = z.object({
+  limit: z.coerce.number().min(1).max(100).default(20),
+  page: z.coerce.number().min(1).default(1),
+});
+
+export const getSnippetsQuerySchema = paginationQuerySchema.extend({
   search: z.string().optional(),
   technology: z.enum(TECHNOLOGIES).optional(),
   useCase: z.enum(USE_CASES).optional(),
   sortBy: z.enum(["newest", "oldest", "popular"]).default("newest"),
-  limit: z.coerce.number().min(1).max(100).default(20),
-  page: z.coerce.number().min(1).default(1),
 });
 
 export type CreateSnippetDTO = z.infer<typeof createSnippetSchema>;
 export type UpdateSnippetDTO = z.infer<typeof updateSnippetSchema>;
 export type GetSnippetsQueryDTO = z.infer<typeof getSnippetsQuerySchema>;
+export type PaginationQueryDTO = z.infer<typeof paginationQuerySchema>;

@@ -4,9 +4,11 @@ export {
   createSnippetSchema,
   updateSnippetSchema,
   getSnippetsQuerySchema,
+  paginationQuerySchema,
   type CreateSnippetDTO,
   type UpdateSnippetDTO,
   type GetSnippetsQueryDTO,
+  type PaginationQueryDTO,
 } from "./snippet.dto";
 
 export { voteSchema, type VoteDTO } from "./vote.dto";

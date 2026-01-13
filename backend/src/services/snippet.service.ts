@@ -1,5 +1,5 @@
 import { Snippet } from "@/models";
-import { ApiError } from "@/utils";
+import { ApiError, paginate, getSkip, PaginationParams } from "@/utils";
 import { CreateSnippetDTO, UpdateSnippetDTO, GetSnippetsQueryDTO } from "@/dto";
 import { Types } from "mongoose";
 
@@ -34,24 +34,18 @@ export const getSnippets = async (query: GetSnippetsQueryDTO) => {
         ? { likesCount: -1 }
         : { createdAt: -1 };
 
-  const skip = (page - 1) * limit;
-
   const [snippets, total] = await Promise.all([
-    Snippet.find(filter).sort(sortOptions).limit(limit).skip(skip).populate("author", "username"),
+    Snippet.find(filter)
+      .sort(sortOptions)
+      .limit(limit)
+      .skip(getSkip(page, limit))
+      .populate("author", "username"),
     Snippet.countDocuments(filter),
   ]);
 
   return {
     snippets,
-    pagination: {
-      current: page,
-      total: Math.ceil(total / limit),
-      limit,
-      count: snippets.length,
-      totalSnippets: total,
-      hasNext: page < Math.ceil(total / limit),
-      hasPrev: page > 1,
-    },
+    pagination: paginate({ page, limit, totalItems: total, count: snippets.length }),
   };
 };
 
@@ -73,8 +67,21 @@ export const getSnippetById = async (id: string, requestingUserId?: string) => {
   return snippet;
 };
 
-export const getSnippetsByAuthor = async (authorId: string) => {
-  return Snippet.find({ author: authorId }).sort({ createdAt: -1 });
+export const getSnippetsByAuthor = async (authorId: string, query: PaginationParams) => {
+  const { limit, page } = query;
+
+  const [snippets, total] = await Promise.all([
+    Snippet.find({ author: authorId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(getSkip(page, limit)),
+    Snippet.countDocuments({ author: authorId }),
+  ]);
+
+  return {
+    snippets,
+    pagination: paginate({ page, limit, totalItems: total, count: snippets.length }),
+  };
 };
 
 export const updateSnippet = async (id: string, data: UpdateSnippetDTO, userId: string) => {

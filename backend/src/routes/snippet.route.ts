@@ -1,12 +1,22 @@
 import { Router } from "express";
 import { snippetController } from "@/controllers";
 import { validate, authenticate } from "@/middlewares";
-import { createSnippetSchema, updateSnippetSchema, getSnippetsQuerySchema } from "@/dto";
+import {
+  createSnippetSchema,
+  updateSnippetSchema,
+  getSnippetsQuerySchema,
+  paginationQuerySchema,
+} from "@/dto";
 
 export const router = Router();
 
 router.get("/", validate({ query: getSnippetsQuerySchema }), snippetController.getAllSnippets);
-router.get("/my-snippets", authenticate, snippetController.getMySnippets);
+router.get(
+  "/my-snippets",
+  authenticate,
+  validate({ query: paginationQuerySchema }),
+  snippetController.getMySnippets
+);
 router.get("/:id", snippetController.getOneSnippet);
 
 router.use(authenticate);
