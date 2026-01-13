@@ -9,14 +9,14 @@ export const errorHandler = (
   _next: NextFunction
 ): void => {
   if (err instanceof ApiError) {
-    res.status(err.statusCode).json({ error: err.message });
+    res.status(err.statusCode).json({ success: false, message: err.message });
     return;
   }
 
   logger.error({ err }, "Unexpected error");
-  res.status(500).json({ error: "Server error" });
+  res.status(500).json({ success: false, message: "Server error" });
 };
 
 export const notFoundHandler = (_req: Request, res: Response): void => {
-  res.status(404).json({ error: "Route not found" });
+  res.status(404).json({ success: false, message: "Route not found" });
 };

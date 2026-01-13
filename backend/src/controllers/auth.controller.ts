@@ -15,9 +15,9 @@ export const register = async (
     tokenService.setRefreshTokenCookie(res, tokens.refreshToken);
 
     res.status(201).json({
+      success: true,
       message: "Account created successfully",
-      accessToken: tokens.accessToken,
-      user: user.toJSON(),
+      data: { accessToken: tokens.accessToken, user: user.toJSON() },
     });
   } catch (error) {
     next(error);
@@ -37,9 +37,9 @@ export const login = async (
     tokenService.setRefreshTokenCookie(res, tokens.refreshToken);
 
     res.status(200).json({
+      success: true,
       message: "Logged in successfully",
-      accessToken: tokens.accessToken,
-      user: user.toJSON(),
+      data: { accessToken: tokens.accessToken, user: user.toJSON() },
     });
   } catch (error) {
     next(error);
@@ -51,13 +51,13 @@ export const refresh = async (req: Request, res: Response, next: NextFunction): 
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      res.status(401).json({ error: "Session expired, please login again" });
+      res.status(401).json({ success: false, message: "Session expired, please login again" });
       return;
     }
 
     const tokenExists = await tokenService.findRefreshToken(refreshToken);
     if (!tokenExists) {
-      res.status(401).json({ error: "Session expired, please login again" });
+      res.status(401).json({ success: false, message: "Session expired, please login again" });
       return;
     }
 
@@ -69,8 +69,9 @@ export const refresh = async (req: Request, res: Response, next: NextFunction): 
     tokenService.setRefreshTokenCookie(res, tokens.refreshToken);
 
     res.status(200).json({
+      success: true,
       message: "Token refreshed successfully",
-      accessToken: tokens.accessToken,
+      data: { accessToken: tokens.accessToken },
     });
   } catch (error) {
     next(error);
@@ -85,5 +86,5 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
   }
 
   tokenService.clearRefreshTokenCookie(res);
-  res.status(200).json({ message: "Logged out successfully" });
+  res.status(200).json({ success: true, message: "Logged out successfully" });
 };
