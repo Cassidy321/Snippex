@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const voteParamsSchema = z.object({
-  snippetId: z.string().min(1, "Snippet id is required"),
+  snippetId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid snippet id"),
 });
 
 export const voteSchema = z.object({
