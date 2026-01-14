@@ -7,6 +7,9 @@ const envSchema = z.object({
   MONGODB_URI: z.string().min(1, "MONGODB_URI variable is required"),
   JWT_SECRET: z.string().min(1, "JWT_SECRET variable is required"),
   JWT_REFRESH_SECRET: z.string().min(1, "JWT_REFRESH_SECRET is required"),
+  ACCESS_TOKEN_EXPIRY: z.string().default("15m"),
+  REFRESH_TOKEN_EXPIRY: z.string().default("30d"),
+  REFRESH_TOKEN_MAX_AGE_DAYS: z.coerce.number().default(30),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
 });
 

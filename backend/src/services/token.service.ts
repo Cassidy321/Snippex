@@ -18,19 +18,17 @@ interface Tokens {
   refreshToken: string;
 }
 
-const ACCESS_TOKEN_EXPIRY = "15m";
-const REFRESH_TOKEN_EXPIRY = "30d";
-const REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
+const getRefreshTokenMaxAge = () => env.REFRESH_TOKEN_MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
 
 export const generateAccessToken = (userId: string, email: string): string => {
   return jwt.sign({ id: userId, email }, env.JWT_SECRET, {
-    expiresIn: ACCESS_TOKEN_EXPIRY,
+    expiresIn: env.ACCESS_TOKEN_EXPIRY as jwt.SignOptions["expiresIn"],
   });
 };
 
 export const generateRefreshToken = (userId: string): string => {
   return jwt.sign({ id: userId }, env.JWT_REFRESH_SECRET, {
-    expiresIn: REFRESH_TOKEN_EXPIRY,
+    expiresIn: env.REFRESH_TOKEN_EXPIRY as jwt.SignOptions["expiresIn"],
   });
 };
 
@@ -58,7 +56,7 @@ export const verifyRefreshToken = (token: string): RefreshTokenPayload => {
 };
 
 export const saveRefreshToken = async (token: string, userId: string): Promise<void> => {
-  const expiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE);
+  const expiresAt = new Date(Date.now() + getRefreshTokenMaxAge());
   await RefreshToken.create({ token, user: userId, expiresAt });
 };
 
@@ -80,7 +78,7 @@ export const setRefreshTokenCookie = (res: Response, refreshToken: string): void
     httpOnly: true,
     secure: env.NODE_ENV === "production",
     sameSite: env.NODE_ENV === "production" ? "strict" : "lax",
-    maxAge: REFRESH_TOKEN_MAX_AGE,
+    maxAge: getRefreshTokenMaxAge(),
   });
 };
 
