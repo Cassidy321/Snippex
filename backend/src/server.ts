@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import crypto from "crypto";
 
-import { env, logger, connectDatabase } from "@/config";
+import { env, logger, connectDatabase, isDatabaseConnected } from "@/config";
 import { errorHandler, notFoundHandler } from "@/middlewares";
 import { authRoutes, snippetRoutes, voteRoutes } from "@/routes";
 import { globalLimiter, authLimiter } from "@/utils";
@@ -36,7 +36,13 @@ app.use("/api/snippets", snippetRoutes);
 app.use("/api/snippets", voteRoutes);
 
 app.get("/health", (_req, res) => {
-  res.json({ status: "OK", timestamp: new Date().toISOString() });
+  const dbConnected = isDatabaseConnected();
+  const status = dbConnected ? "OK" : "DEGRADED";
+  res.status(dbConnected ? 200 : 503).json({
+    status,
+    database: dbConnected ? "connected" : "disconnected",
+    timestamp: new Date().toISOString(),
+  });
 });
 
 app.use(notFoundHandler);

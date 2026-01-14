@@ -24,6 +24,7 @@ const voteSchema = new Schema(
 );
 
 voteSchema.index({ user: 1, snippet: 1 }, { unique: true });
+voteSchema.index({ snippet: 1 });
 
 export type Vote = InferSchemaType<typeof voteSchema>;
 export const Vote = mongoose.model("Vote", voteSchema);

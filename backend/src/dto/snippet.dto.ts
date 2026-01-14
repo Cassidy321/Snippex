@@ -4,7 +4,7 @@ import { TECHNOLOGIES, USE_CASES } from "@/models";
 export const createSnippetSchema = z.object({
   title: z
     .string()
-    .min(1, "A title is requierd")
+    .min(1, "A title is required")
     .max(100, "The title cannot exceed 100 characters"),
   description: z
     .string()

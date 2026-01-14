@@ -11,3 +11,7 @@ export const connectDatabase = async (): Promise<void> => {
     process.exit(1);
   }
 };
+
+export const isDatabaseConnected = (): boolean => {
+  return mongoose.connection.readyState === 1;
+};
