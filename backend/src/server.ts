@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
+import crypto from "crypto";
 
 import { env, logger, connectDatabase } from "@/config";
 import { errorHandler, notFoundHandler } from "@/middlewares";
@@ -23,7 +24,12 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
 app.use(globalLimiter);
-app.use(pinoHttp({ logger }));
+app.use(
+  pinoHttp({
+    logger,
+    genReqId: (req) => req.headers["x-request-id"] || crypto.randomUUID(),
+  })
+);
 
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/snippets", snippetRoutes);
