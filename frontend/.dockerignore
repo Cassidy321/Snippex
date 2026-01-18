@@ -32,3 +32,7 @@ coverage
 # OS files
 .DS_Store
 Thumbs.db
+
+# Docker files (not needed in build context)
+Dockerfile
+.dockerignore
