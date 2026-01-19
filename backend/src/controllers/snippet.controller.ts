@@ -18,7 +18,7 @@ export const getAllSnippets = catchAsync(async (req, res) => {
 });
 
 export const getOneSnippet = catchAsync(async (req, res) => {
-  const snippet = await snippetService.getSnippetById(req.params.id!, req.user?.id);
+  const snippet = await snippetService.getSnippetById(req.params.id as string, req.user?.id);
   res.json({ success: true, data: { snippet } });
 });
 
@@ -33,11 +33,15 @@ export const getMySnippets = catchAsync(async (req, res) => {
 });
 
 export const updateOneSnippet = catchAsync(async (req, res) => {
-  const snippet = await snippetService.updateSnippet(req.params.id!, req.body, req.user!.id);
+  const snippet = await snippetService.updateSnippet(
+    req.params.id as string,
+    req.body,
+    req.user!.id
+  );
   res.json({ success: true, message: "Snippet updated", data: { snippet } });
 });
 
 export const deleteOneSnippet = catchAsync(async (req, res) => {
-  await snippetService.deleteSnippet(req.params.id!, req.user!.id);
+  await snippetService.deleteSnippet(req.params.id as string, req.user!.id);
   res.json({ success: true, message: "Snippet deleted" });
 });

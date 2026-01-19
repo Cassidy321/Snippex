@@ -3,7 +3,11 @@ FROM node:22-alpine AS development
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+COPY shared ./shared
+COPY frontend/package*.json ./frontend/
+
+WORKDIR /app/frontend
+RUN npm ci --ignore-scripts
 
 EXPOSE 5173
 
@@ -14,10 +18,14 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+COPY shared ./shared
+COPY frontend/package*.json ./frontend/
 
-COPY index.html tsconfig*.json vite.config.ts ./
-COPY src ./src
+WORKDIR /app/frontend
+RUN npm ci --ignore-scripts
+
+COPY frontend/index.html frontend/tsconfig*.json frontend/vite.config.ts ./
+COPY frontend/src ./src
 
 RUN npm run build
 
@@ -25,9 +33,9 @@ FROM nginx:1.27-alpine AS production
 
 RUN rm /etc/nginx/conf.d/default.conf
 
-COPY nginx.conf /etc/nginx/conf.d/
+COPY frontend/nginx.conf /etc/nginx/conf.d/
 
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/frontend/dist /usr/share/nginx/html
 
 RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chown -R nginx:nginx /var/cache/nginx && \

@@ -3,15 +3,17 @@ name: snippex
 services:
   frontend:
     build:
-      context: ../frontend
+      context: ..
+      dockerfile: frontend/Dockerfile
       target: development
     volumes:
-      - ../frontend/src:/app/src
-      - ../frontend/index.html:/app/index.html
-      - ../frontend/vite.config.ts:/app/vite.config.ts
-      - ../frontend/tsconfig.json:/app/tsconfig.json
-      - ../frontend/tsconfig.app.json:/app/tsconfig.app.json
-      - ../frontend/tsconfig.node.json:/app/tsconfig.node.json
+      - ../frontend/src:/app/frontend/src
+      - ../frontend/index.html:/app/frontend/index.html
+      - ../frontend/vite.config.ts:/app/frontend/vite.config.ts
+      - ../frontend/tsconfig.json:/app/frontend/tsconfig.json
+      - ../frontend/tsconfig.app.json:/app/frontend/tsconfig.app.json
+      - ../frontend/tsconfig.node.json:/app/frontend/tsconfig.node.json
+      - ../shared:/app/shared
     ports:
       - "3000:5173"
     environment:
@@ -36,11 +38,13 @@ services:
 
   api:
     build:
-      context: ../backend
+      context: ..
+      dockerfile: backend/Dockerfile
       target: base
     volumes:
-      - ../backend/src:/app/src
-      - ../backend/tsconfig.json:/app/tsconfig.json
+      - ../backend/src:/app/backend/src
+      - ../backend/tsconfig.json:/app/backend/tsconfig.json
+      - ../shared:/app/shared
     ports:
       - "${PORT}:${PORT}"
     env_file:

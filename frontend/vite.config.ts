@@ -8,14 +8,15 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
+      "@snippex/shared": path.resolve(__dirname, "../shared/src/index.ts"),
     },
   },
   server: {
-    port: 3000,
-    open: true,
+    port: 5173,
+    host: true,
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        target: process.env.VITE_API_URL || "http://localhost:3333",
         changeOrigin: true,
         secure: false,
       },

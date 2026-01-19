@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types, InferSchemaType } from "mongoose";
+import mongoose, { Schema, Types, InferSchemaType, Model } from "mongoose";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
@@ -82,6 +82,11 @@ userSchema.methods.toJSON = function () {
 
 export type User = InferSchemaType<typeof userSchema>;
 
-export const User = mongoose.model("User", userSchema);
+interface UserModel extends Model<User> {
+  isEmailTaken(email: string, excludeUserId?: Types.ObjectId): Promise<boolean>;
+  isUsernameTaken(username: string, excludeUserId?: Types.ObjectId): Promise<boolean>;
+}
+
+export const User = mongoose.model<User, UserModel>("User", userSchema);
 
 export type UserDocument = InstanceType<typeof User>;
