@@ -1,15 +1,21 @@
 {
   "name": "snippex",
   "private": true,
+  "workspaces": [
+    "shared",
+    "frontend",
+    "backend"
+  ],
   "scripts": {
     "prepare": "husky"
   },
   "lint-staged": {
     "frontend/**/*.{ts,tsx}": [
-      "npm run lint --prefix frontend"
+      "eslint --config frontend/eslint.config.js --fix"
     ],
     "backend/**/*.ts": [
-      "npm run lint --prefix backend"
+      "eslint --config backend/eslint.config.mjs --fix",
+      "prettier --write"
     ]
   },
   "devDependencies": {
